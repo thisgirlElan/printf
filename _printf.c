@@ -64,13 +64,24 @@ char buffer[1024];
 int buffer_index = 0;
 int printed_chars = 0;
 
+int flag_plus = 0;
+int flag_space = 0;
+int flag_hash = 0;
+int flag_zero = 0;
+int flag_minus = 0;
+int field_width = 0;
+int precision = -1;
+int num = va_arg(args, int);
+int num_digits = 0;
+unsigned int temp = num;
+
 va_start(args, format);
 
 while (*format != '\0')
 {
 if (*format != '%')
 {
-if (buffer_index < sizeof(buffer) - 1)
+if (buffer_index < (int)(sizeof(buffer) - 1))
 {
 if (*format < 32 || *format >= 127)
 {
@@ -94,12 +105,6 @@ else
 {
 format++;
 
-int flag_plus = 0;
-int flag_space = 0;
-int flag_hash = 0;
-int flag_zero = 0;
-int flag_minus = 0;
-
 while (*format == '+' || *format == ' ' || *format == '#' || *format == '0' || *format == '-')
 {
 if (*format == '+')
@@ -116,15 +121,11 @@ flag_minus = 1;
 format++;
 }
 
-int field_width = 0;
-
 while (*format >= '0' && *format <= '9')
 {
 field_width = field_width * 10 + (*format - '0');
 format++;
 }
-
-int precision = -1;
 
 if (*format == '.')
 {
@@ -221,7 +222,6 @@ break;
 case 'd':
 case 'i':
 {
-int num = va_arg(args, int);
 if (num < 0)
 {
 num = -num;
@@ -239,7 +239,6 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int num_digits = 0;
 int temp = num;
 while (temp > 0)
 {
@@ -278,8 +277,6 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int num_digits = 0;
-unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 10;
@@ -317,8 +314,6 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int num_digits = 0;
-unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 8;
@@ -335,7 +330,7 @@ for (int i = 0; i < precision - num_digits; i++)
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12]; // Max length of an int (including sign)
+char num_str[12];
 snprintf(num_str, sizeof(num_str), "%o", num);
 for (int i = 0; i < num_digits; i++)
 {
@@ -360,8 +355,6 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int num_digits = 0;
-unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -379,7 +372,7 @@ for (int i = 0; i < precision - num_digits; i++)
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12]; // Max length of an int (including sign)
+char num_str[12];
 snprintf(num_str, sizeof(num_str), "%x", num);
 for (int i = 0; i < num_digits; i++)
 {
@@ -404,8 +397,6 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int num_digits = 0;
-unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -497,7 +488,6 @@ for (int i = 0; i < str_len; i++)
 buffer[buffer_index++] = null_str[i];
 }
 printed_chars += str_len;
-}
 }
 break;
 
