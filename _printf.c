@@ -75,7 +75,6 @@ int field_width = 0;
 int precision = -1;
 int num = va_arg(args, int);
 int num_digits = 0;
-unsigned int temp = 0;
 
 while (*format != '\0')
 {
@@ -92,7 +91,6 @@ else
 {
 buffer[buffer_index++] = *format;
 }
-
 printed_chars++;
 }
 else
@@ -493,6 +491,7 @@ buffer[buffer_index++] = null_str[i];
 }
 printed_chars += str_len;
 }
+}
 break;
 
 case 'r':
@@ -570,7 +569,7 @@ break;
 }
 }
 
-if (buffer_index < (int)(sizeof(buffer) - 1))
+if (buffer_index >= (int)(sizeof(buffer) - 1))
 {
 write(1, buffer, buffer_index);
 buffer_index = 0;
