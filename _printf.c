@@ -66,7 +66,6 @@ int printed_chars = 0;
 
 va_start(args, format);
 
-int precision = -1;
 int num = va_arg(args, int);
 int num_digits = 0;
 char num_str[12];
@@ -99,11 +98,11 @@ else
 {
 format++;
 
-int flag_plus = 0;
-int flag_space = 0;
-int flag_hash = 0;
-int flag_zero = 0;
-int flag_minus = 0;
+int flag_plus;
+int flag_space;
+int flag_hash;
+int flag_zero;
+int flag_minus;
 
 while (*format == '+' || *format == ' ' || *format == '#' || *format == '0' || *format == '-')
 {
@@ -128,6 +127,8 @@ while (*format >= '0' && *format <= '9')
 field_width = field_width * 10 + (*format - '0');
 format++;
 }
+
+int precision = -1;
 
 if (*format == '.')
 {
