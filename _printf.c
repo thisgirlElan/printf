@@ -75,6 +75,8 @@ int field_width = 0;
 int precision = -1;
 int num = va_arg(args, int);
 int num_digits = 0;
+char num_str[12];
+int i;
 
 while (*format != '\0')
 {
@@ -144,7 +146,7 @@ char c = va_arg(args, int);
 if (!flag_minus)
 {
 int padding = field_width - 1;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = flag_zero ? '0' : ' ';
 }
@@ -153,7 +155,7 @@ buffer[buffer_index++] = c;
 if (flag_minus)
 {
 int padding = field_width - 1;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -173,19 +175,19 @@ str_len = precision;
 if (!flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = flag_zero ? '0' : ' ';
 }
 }
-for (int i = 0; i < str_len; i++)
+for (i = 0; i < str_len; i++)
 {
 buffer[buffer_index++] = str[i];
 }
 if (flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -199,7 +201,7 @@ case '%':
 if (!flag_minus)
 {
 int padding = field_width - 1;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = flag_zero ? '0' : ' ';
 }
@@ -208,7 +210,7 @@ buffer[buffer_index++] = '%';
 if (flag_minus)
 {
 int padding = field_width - 1;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -220,6 +222,7 @@ break;
 case 'd':
 case 'i':
 {
+int temp;
 if (num < 0)
 {
 num = -num;
@@ -237,7 +240,7 @@ if (precision == 0 && num == 0)
 {
 break;
 }
-int temp = num;
+temp = num;
 while (temp > 0)
 {
 temp /= 10;
@@ -245,14 +248,14 @@ num_digits++;
 }
 if (num_digits < precision)
 {
-for (int i = 0; i < precision - num_digits; i++)
+for (i = 0; i < precision - num_digits; i++)
 {
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12];
+
 snprintf(num_str, sizeof(num_str), "%d", num);
-for (int i = 0; i < num_digits; i++)
+for (i = 0; i < num_digits; i++)
 {
 buffer[buffer_index++] = num_str[i];
 }
@@ -260,7 +263,7 @@ printed_chars += num_digits;
 if (!flag_minus)
 {
 int padding = field_width - num_digits;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -271,11 +274,13 @@ break;
 case 'u':
 {
 unsigned int num = va_arg(args, unsigned int);
+unsigned int temp;
+
 if (precision == 0 && num == 0)
 {
 break;
 }
-unsigned int temp = num;
+temp = num;
 while (temp > 0)
 {
 temp /= 10;
@@ -283,14 +288,14 @@ num_digits++;
 }
 if (num_digits < precision)
 {
-for (int i = 0; i < precision - num_digits; i++)
+for (i = 0; i < precision - num_digits; i++)
 {
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12];
+
 snprintf(num_str, sizeof(num_str), "%u", num);
-for (int i = 0; i < num_digits; i++)
+for (i = 0; i < num_digits; i++)
 {
 buffer[buffer_index++] = num_str[i];
 }
@@ -298,7 +303,7 @@ printed_chars += num_digits;
 if (!flag_minus)
 {
 int padding = field_width - num_digits;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -309,11 +314,12 @@ break;
 case 'o':
 {
 unsigned int num = va_arg(args, unsigned int);
+unsigned int temp;
 if (precision == 0 && num == 0)
 {
 break;
 }
-unsigned int temp = num;
+temp = num;
 while (temp > 0)
 {
 temp /= 8;
@@ -325,14 +331,14 @@ buffer[buffer_index++] = '0';
 }
 if (num_digits < precision)
 {
-for (int i = 0; i < precision - num_digits; i++)
+for (i = 0; i < precision - num_digits; i++)
 {
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12];
+
 snprintf(num_str, sizeof(num_str), "%o", num);
-for (int i = 0; i < num_digits; i++)
+for (i = 0; i < num_digits; i++)
 {
 buffer[buffer_index++] = num_str[i];
 }
@@ -340,7 +346,7 @@ printed_chars += num_digits;
 if (!flag_minus)
 {
 int padding = field_width - num_digits;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -351,11 +357,12 @@ break;
 case 'x':
 {
 unsigned int num = va_arg(args, unsigned int);
+unsigned int temp;
 if (precision == 0 && num == 0)
 {
 break;
 }
-unsigned int temp = num;
+temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -368,14 +375,14 @@ buffer[buffer_index++] = 'x';
 }
 if (num_digits < precision)
 {
-for (int i = 0; i < precision - num_digits; i++)
+for (i = 0; i < precision - num_digits; i++)
 {
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12];
+
 snprintf(num_str, sizeof(num_str), "%x", num);
-for (int i = 0; i < num_digits; i++)
+for (i = 0; i < num_digits; i++)
 {
 buffer[buffer_index++] = num_str[i];
 }
@@ -383,7 +390,7 @@ printed_chars += num_digits;
 if (!flag_minus)
 {
 int padding = field_width - num_digits;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -394,11 +401,13 @@ break;
 case 'X':
 {
 unsigned int num = va_arg(args, unsigned int);
+unsigned int temp;
+
 if (precision == 0 && num == 0)
 {
 break;
 }
-unsigned int temp = num;
+temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -411,14 +420,14 @@ buffer[buffer_index++] = 'X';
 }
 if (num_digits < precision)
 {
-for (int i = 0; i < precision - num_digits; i++)
+for (i = 0; i < precision - num_digits; i++)
 {
 buffer[buffer_index++] = '0';
 }
 }
-char num_str[12];
+
 snprintf(num_str, sizeof(num_str), "%X", num);
-for (int i = 0; i < num_digits; i++)
+for (i = 0; i < num_digits; i++)
 {
 buffer[buffer_index++] = num_str[i];
 }
@@ -426,7 +435,7 @@ printed_chars += num_digits;
 if (!flag_minus)
 {
 int padding = field_width - num_digits;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -450,7 +459,7 @@ if (precision >= 0 && precision < str_len)
 {
 str_len = precision;
 }
-for (int i = 0; i < str_len; i++)
+for (i = 0; i < str_len; i++)
 {
 if (str[i] < 32 || str[i] >= 127)
 {
@@ -474,7 +483,7 @@ if (ptr != NULL)
 unsigned long int address = (unsigned long int)ptr;
 buffer[buffer_index++] = '0';
 buffer[buffer_index++] = 'x';
-for (int i = 15; i >= 0; i--)
+for (i = 15; i >= 0; i--)
 {
 int hex_digit = (address >> (i * 4)) & 0xF;
 buffer[buffer_index++] = hex_digit < 10 ? '0' + hex_digit : 'a' + (hex_digit - 10);
@@ -485,7 +494,7 @@ else
 {
 char *null_str = "(nil)";
 int str_len = strlen(null_str);
-for (int i = 0; i < str_len; i++)
+for (i = 0; i < str_len; i++)
 {
 buffer[buffer_index++] = null_str[i];
 }
@@ -505,19 +514,19 @@ str_len = precision;
 if (!flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = flag_zero ? '0' : ' ';
 }
 }
-for (int i = str_len - 1; i >= 0; i--)
+for (i = str_len - 1; i >= 0; i--)
 {
 buffer[buffer_index++] = str[i];
 }
 if (flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
@@ -537,19 +546,19 @@ str_len = precision;
 if (!flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = flag_zero ? '0' : ' ';
 }
 }
-for (int i = 0; i < str_len; i++)
+for (i = 0; i < str_len; i++)
 {
 buffer[buffer_index++] = rot13(str[i]);
 }
 if (flag_minus)
 {
 int padding = field_width - str_len;
-for (int i = 0; i < padding; i++)
+for (i = 0; i < padding; i++)
 {
 buffer[buffer_index++] = ' ';
 }
