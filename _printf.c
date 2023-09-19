@@ -66,7 +66,6 @@ int printed_chars = 0;
 
 va_start(args, format);
 
-int field_width = 0;
 int precision = -1;
 int num = va_arg(args, int);
 int num_digits = 0;
@@ -121,6 +120,8 @@ flag_minus = 1;
 
 format++;
 }
+
+int field_width = 0;
 
 while (*format >= '0' && *format <= '9')
 {
@@ -224,6 +225,8 @@ case 'd':
 case 'i':
 {
 int temp;
+int flag_plus = 0;
+
 if (num < 0)
 {
 num = -num;
