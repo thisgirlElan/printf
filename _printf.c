@@ -64,6 +64,8 @@ char buffer[1024];
 int buffer_index = 0;
 int printed_chars = 0;
 
+va_start(args, format);
+
 int flag_plus = 0;
 int flag_space = 0;
 int flag_hash = 0;
@@ -73,9 +75,7 @@ int field_width = 0;
 int precision = -1;
 int num = va_arg(args, int);
 int num_digits = 0;
-unsigned int temp = num;
-
-va_start(args, format);
+unsigned int temp = 0;
 
 while (*format != '\0')
 {
@@ -277,6 +277,7 @@ if (precision == 0 && num == 0)
 {
 break;
 }
+unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 10;
@@ -314,6 +315,7 @@ if (precision == 0 && num == 0)
 {
 break;
 }
+unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 8;
@@ -355,6 +357,7 @@ if (precision == 0 && num == 0)
 {
 break;
 }
+unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -397,6 +400,7 @@ if (precision == 0 && num == 0)
 {
 break;
 }
+unsigned int temp = num;
 while (temp > 0)
 {
 temp /= 16;
@@ -566,7 +570,7 @@ break;
 }
 }
 
-if (buffer_index >= sizeof(buffer) - 1)
+if (buffer_index < (int)(sizeof(buffer) - 1))
 {
 write(1, buffer, buffer_index);
 buffer_index = 0;
