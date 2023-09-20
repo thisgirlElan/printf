@@ -72,7 +72,16 @@ if (*format != '%')
 {
 if (buffer_index < sizeof(buffer) - 1)
 {
+if (*format < 32 || *format >= 127)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "\\x%02X", (unsigned char)*format);
+buffer_index += 4;
+}
+else
+{
 buffer[buffer_index++] = *format;
+}
+
 printed_chars++;
 }
 else
@@ -85,6 +94,21 @@ else
 {
 format++;
 
+int flag_plus = 0;
+int flag_space = 0;
+int flag_hash = 0;
+
+while (*format == '+' || *format == ' ' || *format == '#')
+{
+if (*format == '+')
+flag_plus = 1;
+else if (*format == ' ')
+flag_space = 1;
+else if (*format == '#')
+flag_hash = 1;
+format++;
+}
+
 switch (*format)
 {
 case 'c':
@@ -96,7 +120,23 @@ printed_chars += printf("%s", va_arg(args, char *));
 break;
 case 'd':
 case 'i':
-printed_chars += printf("%d", va_arg(args, int));
+{
+int value = va_arg(args, int);
+if (flag_plus && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%d", value);
+}
+else if (flag_space && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %d", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%d", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
 break;
 case 'b':
 print_binary(va_arg(args, unsigned int));
