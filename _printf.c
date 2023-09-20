@@ -84,6 +84,10 @@ break;
 case 's':
 printed_chars += printf("%s", va_arg(args, char *));
 break;
+case 'd':
+case 'i':
+printed_chars += printf("%d", va_arg(args, int));
+break;
 case '%':
 _putchar('%');
 printed_chars++;
