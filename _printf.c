@@ -86,6 +86,12 @@ printed_chars++;
 }
 else
 {
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
+}
+else
+{
 format++;
 
 switch (*format)
