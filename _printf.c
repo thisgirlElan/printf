@@ -73,7 +73,7 @@ printed_chars++;
 }
 else
 {
-format++; // Move past '%'
+format++;
 
 switch (*format)
 {
