@@ -111,6 +111,14 @@ break;
 case 'x':
 printed_chars += printf("%x", va_arg(args, unsigned int));
 break;
+case 'p':
+{
+void *ptr = va_arg(args, void *);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%lx", (unsigned long)ptr);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += 2;
+}
+break;
 case 'X':
 printed_chars += printf("%X", va_arg(args, unsigned int));
 break;
