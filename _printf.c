@@ -114,6 +114,31 @@ break;
 case 'X':
 printed_chars += printf("%X", va_arg(args, unsigned int));
 break;
+case 'S':
+{
+char *str = va_arg(args, char *);
+while (*str != '\0')
+{
+if (*str < 32 || *str >= 127)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "\\x%02X", (unsigned char)*str);
+buffer_index += 4;
+}
+else
+{
+buffer[buffer_index++] = *str;
+}
+str++;
+printed_chars++;
+        
+if (buffer_index == sizeof(buffer) - 1)
+{
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
+}
+}
+break;
 case '%':
 if (buffer_index < sizeof(buffer) - 1)
 {
