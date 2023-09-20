@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define BUFFER_SIZE 1024
+
 /**
 * _putchar - Write a character to stdout.
 * @c: The character to write.
@@ -60,7 +62,7 @@ return (c);
 int _printf(const char *format, ...)
 {
 va_list args;
-char buffer[1024]; 
+char buffer[BUFFER_SIZE]; 
 int buffer_index = 0;
 int printed_chars = 0;
 
@@ -70,16 +72,18 @@ while (*format != '\0')
 {
 if (*format != '%')
 {
-if (buffer_index < sizeof(buffer) - 1)
+if (buffer_index < BUFFER_SIZE - 1)
 {
-buffer[buffer_index++] = *format;
-printed_chars++;
+buffer[buffer_index] = *format;
+buffer_index++;
 }
 else
 {
 write(1, buffer, buffer_index);
+printed_chars += buffer_index;
 buffer_index = 0;
 }
+printed_chars++;
 }
 else
 {
@@ -88,63 +92,127 @@ format++;
 switch (*format)
 {
 case 'c':
-_putchar(va_arg(args, int));
+if (buffer_index < BUFFER_SIZE - 1)
+{
+buffer[buffer_index] = va_arg(args, int);
+buffer_index++;
+}
+else
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+buffer[buffer_index] = va_arg(args, int);
+buffer_index++;
+}
 printed_chars++;
 break;
 case 's':
-printed_chars += printf("%s", va_arg(args, char *));
+while (*buffer_index < BUFFER_SIZE - 1)
+{
+buffer[buffer_index] = *va_arg(args, char *);
+buffer_index++;
+}
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case 'd':
 case 'i':
-printed_chars += printf("%d", va_arg(args, int));
+buffer_index += snprintf(buffer + buffer_index, BUFFER_SIZE - buffer_index, "%d", va_arg(args, int));
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case 'b':
 print_binary(va_arg(args, unsigned int));
 printed_chars++;
 break;
 case 'u':
-printed_chars += printf("%u", va_arg(args, unsigned int));
+buffer_index += snprintf(buffer + buffer_index, BUFFER_SIZE - buffer_index, "%u", va_arg(args, unsigned int));
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case 'o':
-printed_chars += printf("%o", va_arg(args, unsigned int));
+buffer_index += snprintf(buffer + buffer_index, BUFFER_SIZE - buffer_index, "%o", va_arg(args, unsigned int));
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case 'x':
-printed_chars += printf("%x", va_arg(args, unsigned int));
+buffer_index += snprintf(buffer + buffer_index, BUFFER_SIZE - buffer_index, "%x", va_arg(args, unsigned int));
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case 'X':
-printed_chars += printf("%X", va_arg(args, unsigned int));
+buffer_index += snprintf(buffer + buffer_index, BUFFER_SIZE - buffer_index, "%X", va_arg(args, unsigned int));
+if (buffer_index >= BUFFER_SIZE - 1)
+{
+write(1, buffer, buffer_index);
+printed_chars += buffer_index;
+buffer_index = 0;
+}
 break;
 case '%':
-if (buffer_index < sizeof(buffer) - 1)
+if (buffer_index < BUFFER_SIZE - 1)
 {
-buffer[buffer_index++] = '%';
-printed_chars++;
+buffer[buffer_index] = '%';
+buffer_index++;
 }
 else
 {
 write(1, buffer, buffer_index);
+printed_chars += buffer_index;
 buffer_index = 0;
+buffer[buffer_index] = '%';
+buffer_index++;
 }
+printed_chars++;
 break;
 default:
-if (buffer_index < sizeof(buffer) - 2)
+if (buffer_index < BUFFER_SIZE - 1)
 {
-buffer[buffer_index++] = '%';
-buffer[buffer_index++] = *format;
-printed_chars += 2;
+buffer[buffer_index] = '%';
+buffer_index++;
+buffer[buffer_index] = *format;
+buffer_index++;
 }
 else
 {
 write(1, buffer, buffer_index);
+printed_chars += buffer_index;
 buffer_index = 0;
+buffer[buffer_index] = '%';
+buffer_index++;
+buffer[buffer_index] = *format;
+buffer_index++;
 }
+printed_chars += 2;
 break;
 }
 }
 
-if (buffer_index == sizeof(buffer) - 1)
+if (buffer_index >= BUFFER_SIZE - 1)
 {
 write(1, buffer, buffer_index);
+printed_chars += buffer_index;
 buffer_index = 0;
 }
 
@@ -154,6 +222,7 @@ format++;
 if (buffer_index > 0)
 {
 write(1, buffer, buffer_index);
+printed_chars += buffer_index;
 }
 
 va_end(args);
