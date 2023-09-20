@@ -86,28 +86,7 @@ printed_chars++;
 }
 else
 {
-write(1, buffer, buffer_index);
-buffer_index = 0;
-}
-}
-else
-{
 format++;
-
-int flag_plus = 0;
-int flag_space = 0;
-int flag_hash = 0;
-
-while (*format == '+' || *format == ' ' || *format == '#')
-{
-if (*format == '+')
-flag_plus = 1;
-else if (*format == ' ')
-flag_space = 1;
-else if (*format == '#')
-flag_hash = 1;
-format++;
-}
 
 switch (*format)
 {
@@ -120,23 +99,7 @@ printed_chars += printf("%s", va_arg(args, char *));
 break;
 case 'd':
 case 'i':
-{
-int value = va_arg(args, int);
-if (flag_plus && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%d", value);
-}
-else if (flag_space && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %d", value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%d", value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
-}
+printed_chars += printf("%d", va_arg(args, int));
 break;
 case 'b':
 print_binary(va_arg(args, unsigned int));
