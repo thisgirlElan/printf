@@ -93,15 +93,52 @@ buffer_index = 0;
 else
 {
 format++;
+int has_plus = 0;
+int has_space = 0;
+int has_hash = 0;
+
+while (*format == '+' || *format == ' ' || *format == '#')
+{
+if (*format == '+')
+has_plus = 1;
+else if (*format == ' ')
+has_space = 1;
+else if (*format == '#')
+has_hash = 1;
+
+format++;
+}
 
 switch (*format)
 {
 case 'c':
-_putchar(va_arg(args, int));
+if (has_plus)
+{
+char ch = va_arg(args, int);
+putchar(ch);
 printed_chars++;
+}
+else
+{
+putchar(va_arg(args, int));
+printed_chars++;
+}
 break;
 case 's':
+if (has_plus)
+{
+char *str = va_arg(args, char *);
+while (*str != '\0')
+{
+putchar(*str);
+printed_chars++;
+str++;
+}
+}
+else
+{
 printed_chars += printf("%s", va_arg(args, char *));
+}
 break;
 case 'd':
 case 'i':
