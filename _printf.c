@@ -22,26 +22,9 @@ return (write(1, &c, 1));
 */
 void print_binary(unsigned int num)
 {
-if (num == 0)
-{
-putchar('0');
-return;
-}
-
-int binary[32]; // Assuming 32-bit integers
-int i = 0;
-
-while (num > 0)
-{
-binary[i] = num % 2;
-num /= 2;
-i++;
-}
-
-for (int j = i - 1; j >= 0; j--)
-{
-putchar('0' + binary[j]);
-}
+if (num > 1)
+print_binary(num >> 1);
+putchar('0' + num & 2);
 }
 
 /**
@@ -106,12 +89,8 @@ case 'i':
 printed_chars += printf("%d", va_arg(args, int));
 break;
 case 'b':
-{
-unsigned int num = va_arg(args, unsigned int);
-print_binary(num);
-printed_chars += sizeof(unsigned int) * 8;
-break;
-}
+print_binary(va_arg(args, unsigned int));
+printed_chars++;
 break;
 case '%':
 _putchar('%');
