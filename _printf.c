@@ -92,6 +92,18 @@ case 'b':
 print_binary(va_arg(args, unsigned int));
 printed_chars++;
 break;
+case 'u':
+printed_chars += printf("%u", va_arg(args, unsigned int));
+break;
+case 'o':
+printed_chars += printf("%o", va_arg(args, unsigned int));
+break;
+case 'x':
+printed_chars += printf("%x", va_arg(args, unsigned int));
+break;
+case 'X':
+printed_chars += printf("%X", va_arg(args, unsigned int));
+break;
 case '%':
 _putchar('%');
 printed_chars++;
