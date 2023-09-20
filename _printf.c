@@ -60,6 +60,8 @@ return (c);
 int _printf(const char *format, ...)
 {
 va_list args;
+char buffer[1024]; 
+int buffer_index = 0;
 int printed_chars = 0;
 
 va_start(args, format);
@@ -68,8 +70,16 @@ while (*format != '\0')
 {
 if (*format != '%')
 {
-_putchar(*format);
+if (buffer_index < sizeof(buffer) - 1)
+{
+buffer[buffer_index++] = *format;
 printed_chars++;
+}
+else
+{
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
 }
 else
 {
@@ -105,18 +115,45 @@ case 'X':
 printed_chars += printf("%X", va_arg(args, unsigned int));
 break;
 case '%':
-_putchar('%');
+if (buffer_index < sizeof(buffer) - 1)
+{
+buffer[buffer_index++] = '%';
 printed_chars++;
+}
+else
+{
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
 break;
 default:
-_putchar('%');
-_putchar(*format);
+if (buffer_index < sizeof(buffer) - 2)
+{
+buffer[buffer_index++] = '%';
+buffer[buffer_index++] = *format;
 printed_chars += 2;
+}
+else
+{
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
 break;
 }
 }
 
+if (buffer_index == sizeof(buffer) - 1)
+{
+write(1, buffer, buffer_index);
+buffer_index = 0;
+}
+
 format++;
+}
+
+if (buffer_index > 0)
+{
+write(1, buffer, buffer_index);
 }
 
 va_end(args);
