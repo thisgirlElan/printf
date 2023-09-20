@@ -88,6 +88,10 @@ case 'd':
 case 'i':
 printed_chars += printf("%d", va_arg(args, int));
 break;
+case 'b':
+print_binary(va_arg(args, unsigned int));
+printed_chars++;
+break;
 case '%':
 _putchar('%');
 printed_chars++;
