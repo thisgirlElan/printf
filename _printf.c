@@ -89,8 +89,12 @@ case 'i':
 printed_chars += printf("%d", va_arg(args, int));
 break;
 case 'b':
-print_binary(va_arg(args, unsigned int));
-printed_chars++;
+{
+unsigned int num = va_arg(args, unsigned int);
+print_binary(num);
+printed_chars += sizeof(unsigned int) * 8;
+break;
+}
 break;
 case '%':
 _putchar('%');
