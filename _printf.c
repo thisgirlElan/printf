@@ -76,6 +76,8 @@ int flag_hash = 0;
 int length_modifier_l = 0;
 int length_modifier_h = 0;
 
+int precision = -1;
+
 int field_width = 0;
 
 if (*format != '%')
@@ -130,12 +132,22 @@ length_modifier_h++;
 format++;
 }
 
-
-
 while (*format >= '0' && *format <= '9')
 {
 field_width = field_width * 10 + (*format - '0');
 format++;
+}
+
+if (*format == '.')
+{
+format++;
+
+precision = 0;
+while (*format >= '0' && *format <= '9')
+{
+precision = precision * 10 + (*format - '0');
+format++;
+}
 }
 
 switch (*format)
@@ -155,15 +167,15 @@ if (length_modifier_l == 1)
 long value = va_arg(args, long);
 if (flag_plus && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%ld", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*ld", precision, value);
 }
 else if (flag_space && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %ld", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*ld", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%ld", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*ld", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -173,15 +185,15 @@ else if (length_modifier_h == 1)
 short value = (short)va_arg(args, int);
 if (flag_plus && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%hd", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*hd", precision, value);
 }
 else if (flag_space && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %hd", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*hd", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hd", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*hd", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -191,15 +203,15 @@ else
 int value = va_arg(args, int);
 if (flag_plus && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%d", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*d", precision, value);
 }
 else if (flag_space && value >= 0)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %d", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*d", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%d", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*d", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -215,21 +227,21 @@ case 'u':
 if (length_modifier_l == 1)
 {
 unsigned long value = va_arg(args, unsigned long);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lu", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*lu", field_width, value);
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
 else if (length_modifier_h == 1)
 {
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hu", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*hu", field_width, value);
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
 else
 {
 unsigned int value = va_arg(args, unsigned int);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%u", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*u", field_width, value);
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
@@ -242,11 +254,11 @@ if (length_modifier_l == 1)
 unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%lo", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*lo", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lo", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*lo", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -256,11 +268,11 @@ else if (length_modifier_h == 1)
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%ho", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*ho", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%ho", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*ho", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -270,11 +282,11 @@ else
 unsigned int value = va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%o", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*o", precision, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%o", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*o", precision, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -288,11 +300,11 @@ if (length_modifier_l == 1)
 unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%lx", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*lx", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lx", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*lx", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -302,11 +314,11 @@ else if (length_modifier_h == 1)
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%hx", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*hx", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hx", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*hx", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -316,11 +328,11 @@ else
 unsigned int value = va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%x", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*x", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%x", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*x", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -340,11 +352,11 @@ if (length_modifier_l == 1)
 unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%lX", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*lX", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lX", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*lX", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -354,11 +366,11 @@ else if (length_modifier_h == 1)
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%hX", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*hX", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hX", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*hX", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -368,11 +380,11 @@ else
 unsigned int value = va_arg(args, unsigned int);
 if (flag_hash)
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%X", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*X", field_width, value);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%X", value);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*X", field_width, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
