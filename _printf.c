@@ -71,22 +71,8 @@ while (*format != '\0')
 {
 if (*format != '%')
 {
-if (buffer_index < sizeof(buffer) - 1 && format[1] == '+' && (*format == 'd' || *format == 'i') && va_arg(args, int) >= 0)
+if (buffer_index < sizeof(buffer) - 1)
 {
-buffer[buffer_index++] = '+';
-}
-
-else if (buffer_index < sizeof(buffer) - 1 && format[1] == ' ' && (*format == 'd' || *format == 'i') && va_arg(args, int) >= 0)
-{
-buffer[buffer_index++] = ' ';
-}
-
-else if (buffer_index < sizeof(buffer) - 1 && format[1] == '#' && (*format == 'x' || *format == 'X'))
-{
-buffer[buffer_index++] = '0';
-buffer[buffer_index++] = *format;
-}
-
 if (*format < 32 || *format >= 127)
 {
 snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "\\x%02X", (unsigned char)*format);
