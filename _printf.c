@@ -72,6 +72,8 @@ while (*format != '\0')
 int flag_plus = 0;
 int flag_space = 0;
 int flag_hash = 0;
+int zero_flag = 0;
+int minus_flag = 0;
 
 int length_modifier_l = 0;
 int length_modifier_h = 0;
@@ -120,6 +122,15 @@ else if (*format == '#')
 {
 flag_hash = 1;
 }
+else if (*format == '0')
+{
+zero_flag = 1;
+}
+else if (*format == '-')
+{
+minus_flag = 1;
+}
+
 format++;
 }
 
@@ -162,86 +173,82 @@ break;
 case 'd':
 case 'i':
 {
-if (length_modifier_l == 1)
+if (precision != -1)
 {
-long value = va_arg(args, long);
-if (flag_plus && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*ld", precision, value);
-}
-else if (flag_space && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*ld", precision, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%s%d.%dd", (minus_flag ? "-" : ""), zero_flag, precision);
+int value = va_arg(args, int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*ld", precision, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+if (length_modifier_l == 1)
+{
+long value = va_arg(args, long);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%sld", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else if (length_modifier_h == 1)
 {
 short value = (short)va_arg(args, int);
-if (flag_plus && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*hd", precision, value);
-}
-else if (flag_space && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*hd", precision, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*hd", precision, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%shd", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else
 {
 int value = va_arg(args, int);
-if (flag_plus && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%.*d", precision, value);
-}
-else if (flag_space && value >= 0)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %.*d", precision, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*d", precision, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%sd", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
 }
 break;
+
 case 'b':
 print_binary(va_arg(args, unsigned int));
 printed_chars++;
 break;
 case 'u':
 {
-if (length_modifier_l == 1)
+if (precision != -1)
 {
-unsigned long value = va_arg(args, unsigned long);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*lu", field_width, value);
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
-}
-else if (length_modifier_h == 1)
-{
-unsigned short value = (unsigned short)va_arg(args, unsigned int);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*hu", field_width, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%s%d.%du", (minus_flag ? "-" : ""), zero_flag, precision);
+unsigned int value = va_arg(args, unsigned int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
 else
 {
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%slu", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+}
+else if (length_modifier_h == 1)
+{
+unsigned short value = (unsigned short)va_arg(args, unsigned int);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%shu", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+}
+else
+{
 unsigned int value = va_arg(args, unsigned int);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*u", field_width, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%su", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+}
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
@@ -249,44 +256,37 @@ printed_chars += strlen(buffer + buffer_index);
 break;
 case 'o':
 {
-if (length_modifier_l == 1)
+if (precision != -1)
 {
-unsigned long value = va_arg(args, unsigned long);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*lo", precision, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%s%d.%do", (minus_flag ? "-" : ""), zero_flag, precision);
+unsigned int value = va_arg(args, unsigned int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*lo", precision, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%slo", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else if (length_modifier_h == 1)
 {
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*ho", precision, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*ho", precision, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%sho", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else
 {
 unsigned int value = va_arg(args, unsigned int);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#.*o", precision, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%.*o", precision, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%so", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
@@ -347,50 +347,44 @@ printed_chars += printf("0x%lx", (unsigned long)ptr);
 break;
 case 'X':
 {
-if (length_modifier_l == 1)
+if (precision != -1)
 {
-unsigned long value = va_arg(args, unsigned long);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*lX", field_width, value);
+char format_str[32]; 
+snprintf(format_str, sizeof(format_str), "%%%s%d.%dX", (minus_flag ? "-" : ""), zero_flag, precision);
+unsigned int value = va_arg(args, unsigned int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
 }
 else
 {
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*lX", field_width, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%slX", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else if (length_modifier_h == 1)
 {
 unsigned short value = (unsigned short)va_arg(args, unsigned int);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*hX", field_width, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*hX", field_width, value);
-}
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += strlen(buffer + buffer_index);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%shX", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 else
 {
 unsigned int value = va_arg(args, unsigned int);
-if (flag_hash)
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%#*X", field_width, value);
-}
-else
-{
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%*X", field_width, value);
+char format_str[32];
+snprintf(format_str, sizeof(format_str), "%%%sX", (minus_flag ? "-" : ""));
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, format_str, value);
 }
 buffer_index += strlen(buffer + buffer_index);
 printed_chars += strlen(buffer + buffer_index);
 }
 }
 break;
+
 case 'S':
 {
 char *str = va_arg(args, char *);
