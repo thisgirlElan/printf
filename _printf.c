@@ -166,9 +166,7 @@ break;
 case 'p':
 {
 void *ptr = va_arg(args, void *);
-snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%lx", (unsigned long)ptr);
-buffer_index += strlen(buffer + buffer_index);
-printed_chars += 2;
+printed_chars += printf("0x%lx", (unsigned long)ptr);
 }
 break;
 case 'X':
