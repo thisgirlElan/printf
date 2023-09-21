@@ -67,8 +67,12 @@ int printed_chars = 0;
 va_start(args, format);
 
 while (*format != '\0')
-
 {
+    
+int flag_plus = 0;
+int flag_space = 0;
+int flag_hash = 0;
+
 if (*format != '%')
 {
 if (buffer_index < sizeof(buffer) - 1)
@@ -94,10 +98,6 @@ buffer_index = 0;
 else
 {
 format++;
-
-int flag_plus = 0;
-int flag_space = 0;
-int flag_hash = 0;
 
 while (*format == '+' || *format == ' ' || *format == '#')
 {
