@@ -73,6 +73,11 @@ int flag_plus = 0;
 int flag_space = 0;
 int flag_hash = 0;
 
+int length_modifier_l = 0;
+int length_modifier_h = 0;
+
+int field_width = 0;
+
 if (*format != '%')
 {
 if (buffer_index < sizeof(buffer) - 1)
@@ -96,7 +101,7 @@ buffer_index = 0;
 }
 }
 else
-{
+
 format++;
 
 while (*format == '+' || *format == ' ' || *format == '#')
@@ -116,6 +121,23 @@ flag_hash = 1;
 format++;
 }
 
+while (*format == 'l' || *format == 'h')
+{
+if (*format == 'l')
+length_modifier_l++;
+else if (*format == 'h')
+length_modifier_h++;
+format++;
+}
+
+
+
+while (*format >= '0' && *format <= '9')
+{
+field_width = field_width * 10 + (*format - '0');
+format++;
+}
+
 switch (*format)
 {
 case 'c':
@@ -127,41 +149,183 @@ printed_chars += printf("%s", va_arg(args, char *));
 break;
 case 'd':
 case 'i':
-if (flag_plus && va_arg(args, int) >= 0)
 {
-_putchar('+');
-printed_chars++;
-}
-else if (flag_space && va_arg(args, int) >= 0)
+if (length_modifier_l == 1)
 {
-_putchar(' ');
-printed_chars++;
+long value = va_arg(args, long);
+if (flag_plus && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%ld", value);
 }
-printed_chars += printf("%d", va_arg(args, int));
+else if (flag_space && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %ld", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%ld", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else if (length_modifier_h == 1)
+{
+short value = (short)va_arg(args, int);
+if (flag_plus && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%hd", value);
+}
+else if (flag_space && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %hd", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hd", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else
+{
+int value = va_arg(args, int);
+if (flag_plus && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "+%d", value);
+}
+else if (flag_space && value >= 0)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, " %d", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%d", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+}
 break;
 case 'b':
 print_binary(va_arg(args, unsigned int));
 printed_chars++;
 break;
 case 'u':
-printed_chars += printf("%u", va_arg(args, unsigned int));
+{
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lu", value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else if (length_modifier_h == 1)
+{
+unsigned short value = (unsigned short)va_arg(args, unsigned int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hu", value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else
+{
+unsigned int value = va_arg(args, unsigned int);
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%u", value);
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+}
 break;
 case 'o':
+{
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-_putchar('0');
-printed_chars++;
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%lo", value);
 }
-printed_chars += printf("%o", va_arg(args, unsigned int));
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lo", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else if (length_modifier_h == 1)
+{
+unsigned short value = (unsigned short)va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%ho", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%ho", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else
+{
+unsigned int value = va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0%o", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%o", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+}
 break;
 case 'x':
+{
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-_putchar('0');
-_putchar('x');
-printed_chars += 2;
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%lx", value);
 }
-printed_chars += printf("%x", va_arg(args, unsigned int));
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lx", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else if (length_modifier_h == 1)
+{
+unsigned short value = (unsigned short)va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%hx", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hx", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else
+{
+unsigned int value = va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0x%x", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%x", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+}
 break;
 case 'p':
 {
@@ -170,13 +334,50 @@ printed_chars += printf("0x%lx", (unsigned long)ptr);
 }
 break;
 case 'X':
+{
+if (length_modifier_l == 1)
+{
+unsigned long value = va_arg(args, unsigned long);
 if (flag_hash)
 {
-_putchar('0');
-_putchar('X');
-printed_chars += 2;
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%lX", value);
 }
-printed_chars += printf("%X", va_arg(args, unsigned int));
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%lX", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else if (length_modifier_h == 1)
+{
+unsigned short value = (unsigned short)va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%hX", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%hX", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+else
+{
+unsigned int value = va_arg(args, unsigned int);
+if (flag_hash)
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "0X%X", value);
+}
+else
+{
+snprintf(buffer + buffer_index, sizeof(buffer) - buffer_index, "%X", value);
+}
+buffer_index += strlen(buffer + buffer_index);
+printed_chars += strlen(buffer + buffer_index);
+}
+}
 break;
 case 'S':
 {
@@ -229,7 +430,7 @@ buffer_index = 0;
 }
 break;
 }
-}
+
 
 if (buffer_index == sizeof(buffer) - 1)
 {
