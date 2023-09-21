@@ -95,10 +95,31 @@ else
 {
 format++;
 
+int flag_plus = 0;
+int flag_space = 0;
+int flag_hash = 0;
+
+while (*format == '+' || *format == ' ' || *format == '#')
+{
+if (*format == '+')
+{
+flag_plus = 1;
+}
+else if (*format == ' ')
+{
+flag_space = 1;
+}
+else if (*format == '#')
+{
+flag_hash = 1;
+}
+format++;
+}
+
 switch (*format)
 {
 case 'c':
-putchar(va_arg(args, int));
+_putchar(va_arg(args, int));
 printed_chars++;
 break;
 case 's':
@@ -106,6 +127,16 @@ printed_chars += printf("%s", va_arg(args, char *));
 break;
 case 'd':
 case 'i':
+if (flag_plus && va_arg(args, int) >= 0)
+{
+_putchar('+');
+printed_chars++;
+}
+else if (flag_space && va_arg(args, int) >= 0)
+{
+_putchar(' ');
+printed_chars++;
+}
 printed_chars += printf("%d", va_arg(args, int));
 break;
 case 'b':
@@ -116,9 +147,20 @@ case 'u':
 printed_chars += printf("%u", va_arg(args, unsigned int));
 break;
 case 'o':
+if (flag_hash)
+{
+_putchar('0');
+printed_chars++;
+}
 printed_chars += printf("%o", va_arg(args, unsigned int));
 break;
 case 'x':
+if (flag_hash)
+{
+_putchar('0');
+_putchar('x');
+printed_chars += 2;
+}
 printed_chars += printf("%x", va_arg(args, unsigned int));
 break;
 case 'p':
@@ -129,8 +171,13 @@ buffer_index += strlen(buffer + buffer_index);
 printed_chars += 2;
 }
 break;
-break;
 case 'X':
+if (flag_hash)
+{
+_putchar('0');
+_putchar('X');
+printed_chars += 2;
+}
 printed_chars += printf("%X", va_arg(args, unsigned int));
 break;
 case 'S':
